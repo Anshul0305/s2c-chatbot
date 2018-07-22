@@ -1,4 +1,5 @@
 import fetch from 'unfetch'
+import axios from 'axios'
 import moment from 'moment'
 import { init } from '@livechat/livechat-visitor-sdk'
 import { call, takeEvery, fork, select, put, take, all } from 'redux-saga/effects'
@@ -18,11 +19,7 @@ import * as actionTypes from '../constants/chatActionTypes'
 import { getEvents } from '../reducers/events'
 import { getUsers, getOwnId } from '../reducers/users'
 
-const googleAuth = require('google-oauth-jwt');
-
 const botEngineClientToken = process.env.REACT_APP_BOTENGINE_CLIENT_TOKEN
-const dialogflowClientToken = process.env.REACT_APP_DIALOGFLOW_CLIENT_TOKEN
-
 const sessionId = String(Math.random())
 
 const sendQueryToBotEngine = query =>
@@ -35,26 +32,36 @@ const sendQueryToBotEngine = query =>
 		body: JSON.stringify({
 			sessionId: sessionId,
 			query: query,
-			storyId: process.env.REACT_APP_BOTENGINE_STORY_ID,
+			storyId: '1520',
 		}),
 	}).then(response => response.json())
 
-const sendQueryToDialogflow = query =>
-fetch('https://dialogflow.googleapis.com/v2/projects/speak2connect-ed605/agent/sessions/50db51b6-14a9-5760-a73a-3d1be26f29a5:detectIntent', {
-	headers: {
-		authorization: `Bearer ${ dialogflowClientToken }`,
-		'Content-Type': 'application/json',
-	},
-	method: 'POST',
-	body: JSON.stringify({
-		queryInput: {
-			text: {
-				text: query,
-				languageCode: "en"
+ async function getDialogflowToken() {
+	try {
+		const token = await axios.get('https://axlewebtech.com/scripts/googleauth/')
+		return token.data
+	} catch (error) {
+		console.error(error)
+	}
+}
+
+const sendQueryToDialogflow = (query, dialogflowClientToken) =>
+	fetch('https://dialogflow.googleapis.com/v2/projects/speak2connect-ed605/agent/sessions/50db51b6-14a9-5760-a73a-3d1be26f29a5:detectIntent', {
+		headers: {
+			authorization: `Bearer ${dialogflowClientToken}`,
+			'Content-Type': 'application/json',
+		},
+		method: 'POST',
+		body: JSON.stringify({
+			queryInput: {
+				text: {
+					text: query,
+					languageCode: "en"
+				}
 			}
-		}
-	}),
-}).then(response => response.json())
+		}),
+	}).then(response => response.json())
+	
 
 function* transferToLiveChat() {
 	const events = yield select(getEvents)
@@ -143,7 +150,8 @@ function* handleSendMessage(sdk, { payload }) {
 	}
 	if (chatService === 'dialogflow') {
 		try {
-			const dilogflowResponse = yield call(sendQueryToDialogflow, payload.text)
+			const dialogflowClientToken = yield call(getDialogflowToken)
+			const dilogflowResponse = yield call(sendQueryToDialogflow, payload.text, dialogflowClientToken)
 			console.log(dilogflowResponse)
 			console.log(payload.text)
 			
