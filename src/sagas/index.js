@@ -32,7 +32,7 @@ const sendQueryToBotEngine = query =>
 		body: JSON.stringify({
 			sessionId: sessionId,
 			query: query,
-			storyId: '1520',
+			storyId: process.env.REACT_APP_BOTENGINE_STORY_ID,
 		}),
 	}).then(response => response.json())
 
