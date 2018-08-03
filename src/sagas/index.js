@@ -7,6 +7,7 @@ import { REHYDRATE, PURGE } from 'redux-persist'
 import { getChatService } from '../reducers/app'
 import {
 	newMessage,
+	newCard,
 	newUser,
 	ownDataReceived,
 	chatEnded,
@@ -38,6 +39,13 @@ const sendQueryToBotEngine = query =>
 
  async function getDialogflowToken() {
 	try {
+		// if(cookie has created time and access token) {
+		//	  if (the difference between now time and cookie created time is less than 1 hour){
+		//			return token_from_cookie
+		//    }
+		// } 
+		// return function get_the_token_and_set_the_cookies()
+		// 
 		const token = await axios.get('https://axlewebtech.com/scripts/googleauth/')
 		return token.data
 	} catch (error) {
@@ -151,11 +159,11 @@ function* handleSendMessage(sdk, { payload }) {
 	if (chatService === 'dialogflow') {
 		try {
 			const dialogflowClientToken = yield call(getDialogflowToken)
-			const dilogflowResponse = yield call(sendQueryToDialogflow, payload.text, dialogflowClientToken)
-			console.log(dilogflowResponse)
+			const dialogflowResponse = yield call(sendQueryToDialogflow, payload.text, dialogflowClientToken)
+			console.log(dialogflowResponse)
 			console.log(payload.text)
 			
-			const messagesToAdd = dilogflowResponse.queryResult.fulfillmentMessages.map(fulfillmentItem => {
+			const messagesToAdd = dialogflowResponse.queryResult.fulfillmentMessages.map(fulfillmentItem => {
 				const message = {
 					id: Math.random(),
 					authorId: 'bot',
@@ -177,6 +185,20 @@ function* handleSendMessage(sdk, { payload }) {
 				return newMessage(message)
 			})
 			yield all(messagesToAdd.map(action => put(action)))
+			if(dialogflowResponse.queryResult.webhookPayload){
+				const cardsToAdd = dialogflowResponse.queryResult.webhookPayload.facebook.attachment.payload.elements.map(element => {
+					const card = {
+						id: Math.random(),
+						authorId: 'bot',
+						timestamp: moment().format(),
+					}
+					card.cardTitle = element.title
+					card.cardImageUrl = element.image_url
+					card.cardButtons = element.buttons
+					return newCard(card)
+				})
+				yield all(cardsToAdd.map(card => put(card)))
+			}
 		} catch (error) {
 			console.log('>> DIALOGFLOW', error)
 		}

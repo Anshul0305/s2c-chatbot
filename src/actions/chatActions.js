@@ -13,6 +13,20 @@ export const newMessage = ({ id, authorId, customId, text, buttons, title, image
 	},
 })
 
+export const newCard = ({ id, authorId, customId, cardText, cardButtons, cardTitle, cardImageUrl, timestamp }) => ({
+	type: actionTypes.NEW_CARD,
+	payload: {
+		id,
+		authorId,
+		customId,
+		cardText,
+		cardButtons,
+		cardTitle,
+		cardImageUrl,
+		timestamp,
+	},
+})
+
 export const sendMessage = ({ text, customId }) => ({
 	type: actionTypes.SEND_MESSAGE,
 	payload: {

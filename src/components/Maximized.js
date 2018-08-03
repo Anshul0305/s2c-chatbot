@@ -134,6 +134,26 @@ const Maximized = ({
 												))}
 											</MessageButtons>
 										)}
+									{message.cardTitle && <MessageTitle title={message.cardTitle} />}
+									{message.cardImageUrl && (
+										<MessageMedia>
+											<img src={message.cardImageUrl} />
+										</MessageMedia>
+									)}
+									{message.cardButtons &&
+										message.cardButtons.length !== 0 && (
+											<MessageButtons>
+												{message.cardButtons.map((button, buttonIndex) => (
+													<MessageButton
+														key={buttonIndex}
+														label={button.title}
+														onClick={() => {
+															window.open(button.url, "_blank");
+														}}
+													/>
+												))}
+											</MessageButtons>
+										)}
 								</Message>
 							))}
 						</MessageGroup>
