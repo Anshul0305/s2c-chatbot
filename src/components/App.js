@@ -5,6 +5,12 @@ import { ThemeProvider, FixedWrapper, darkTheme, elegantTheme, purpleTheme, defa
 
 const themes = {
     defaultTheme: {
+        TitleBar: {
+            css: {
+                padding: '1em',
+                background: 'red'
+            },
+        },
         FixedWrapperMaximized: {
             css: {
                 boxShadow: '0 0 1em rgba(0, 0, 0, 0.1)',
@@ -96,7 +102,7 @@ const themeElegantButton = {
 
 class App extends Component {
     state = {
-        theme: 'purpleTheme'
+        theme: 'defaultTheme'
     }
     
     handleThemeChange = ({ target }) => {
