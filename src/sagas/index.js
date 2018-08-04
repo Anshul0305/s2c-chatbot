@@ -19,6 +19,7 @@ import {
 import * as actionTypes from '../constants/chatActionTypes'
 import { getEvents } from '../reducers/events'
 import { getUsers, getOwnId } from '../reducers/users'
+const store = require('store')
 
 const botEngineClientToken = process.env.REACT_APP_BOTENGINE_CLIENT_TOKEN
 const sessionId = String(Math.random())
@@ -39,15 +40,12 @@ const sendQueryToBotEngine = query =>
 
  async function getDialogflowToken() {
 	try {
-		// if(cookie has created time and access token) {
-		//	  if (the difference between now time and cookie created time is less than 1 hour){
-		//			return token_from_cookie
-		//    }
-		// } 
-		// return function get_the_token_and_set_the_cookies()
-		// 
-		const token = await axios.get('https://axlewebtech.com/scripts/googleauth/')
-		return token.data
+		if((store.get('auth') == null) || (moment().unix() - store.get('auth').created) > 3600){
+			const googleAuthUrl = 'https://axlewebtech.com/scripts/googleauth/?apikey=1FfmbHfnpaZjKFvyi1okTjJJusN455paPH'
+			const authToken = await axios.get(googleAuthUrl)
+			store.set('auth', { token: authToken.data.access_token, created: authToken.data.created })
+		}
+		return store.get('auth').token
 	} catch (error) {
 		console.error(error)
 	}
