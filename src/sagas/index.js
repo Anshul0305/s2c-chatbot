@@ -40,12 +40,17 @@ const sendQueryToBotEngine = query =>
 
  async function getDialogflowToken() {
 	try {
-		if((store.get('auth') == null) || (moment().unix() - store.get('auth').created) > 3600){
+		console.log('Total time', (moment().unix() - store.get('auth').created))
+		if((store.get('auth') == null) || (moment().unix() - store.get('auth').created)>3600){
 			const googleAuthUrl = 'https://axlewebtech.com/scripts/googleauth/?apikey=1FfmbHfnpaZjKFvyi1okTjJJusN455paPH'
 			const authToken = await axios.get(googleAuthUrl)
 			store.set('auth', { token: authToken.data.access_token, created: authToken.data.created })
+			console.log('setting token to', store.get('auth').token)
+			return store.get('auth').token
+		} else {
+			console.log('using stored token', store.get('auth').token)
+			return store.get('auth').token
 		}
-		return store.get('auth').token
 	} catch (error) {
 		console.error(error)
 	}
