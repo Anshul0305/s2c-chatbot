@@ -30,7 +30,7 @@ class App extends Component {
             <ThemeProvider theme={themes[this.state.theme]}>
                 <div style={{
                 }}>
-                    <FixedWrapper.Root maximizedOnInit>
+                    <FixedWrapper.Root minimizedOnInit>
                         <FixedWrapper.Maximized>
                             <Maximized {...this.props} />
                         </FixedWrapper.Maximized>
