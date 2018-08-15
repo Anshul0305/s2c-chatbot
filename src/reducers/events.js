@@ -47,6 +47,7 @@ export default createReducer(initialState, {
 			...state,
 			{
 				...action.payload,
+				id: String(Math.random()),
 				status: 'SENDING',
 				own: true,
 			},

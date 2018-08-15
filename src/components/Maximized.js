@@ -20,7 +20,6 @@ import {
 	Fit,
 	IconButton,
 	SendButton,
-	EmojiIcon,
 	CloseIcon,
 	Column,
 	RateGoodIcon,
@@ -35,7 +34,7 @@ const getAvatarForUser = (userId, users) => {
 	return null
 }
 
-const parseUrl = (url) => url && 'https://' + url.replace(/^(http(s)?\:\/\/)/, '').replace(/^\/\//, '')
+const parseUrl = (url) => url && 'https://' + url.replace(/^(https:\/\/)/, '').replace(/^\/\//, '')
 
 const Maximized = ({
 	chatState,
@@ -111,13 +110,13 @@ const Maximized = ({
 									avatarUrl={parseUrl(getAvatarForUser(message.authorId, users))}
 									date={message.parsedDate}
 									isOwn={message.authorId === ownId || message.own === true}
-									key={message.id}
+									key={message.id||message.customId}
 								>
 									{message.title && <MessageTitle title={message.title} />}
 									{message.text && <MessageText>{message.text}</MessageText>}
 									{message.imageUrl && (
 										<MessageMedia>
-											<img src={message.imageUrl} />
+											<img alt={message.title} src={message.imageUrl} />
 										</MessageMedia>
 									)}
 									{message.buttons &&
@@ -137,7 +136,7 @@ const Maximized = ({
 									{message.cardTitle && <MessageTitle title={message.cardTitle} />}
 									{message.cardImageUrl && (
 										<MessageMedia>
-											<img src={message.cardImageUrl} />
+											<img alt={message.title} src={message.cardImageUrl} />
 										</MessageMedia>
 									)}
 									{message.cardButtons &&

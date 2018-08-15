@@ -31,6 +31,7 @@ export const sendMessage = ({ text, customId }) => ({
 	type: actionTypes.SEND_MESSAGE,
 	payload: {
 		text,
+		id: String(Math.random()),
 		customId: customId || String(Math.random()),
 		timestamp: new Date(),
 	},
